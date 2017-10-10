@@ -26,10 +26,10 @@ export default class FinderTreeLeafComponent extends Component {
 
     render() {
         const location = this.props.locationData;
-        const leafClassName = 'finder-tree-leaf-component.js';
-        const selectedClassName = this.state.selected ? `${leafClassName}--selected` : '';
-        const childrenClassName = location.childCount ? `${leafClassName}--has-children` : '';
-        const finalClassName = `${leafClassName} ${selectedClassName} ${childrenClassName}`;
+        const componentClassName = 'c-finder-tree-leaf';
+        const selectedClassName = this.state.selected ? `${componentClassName}--selected` : '';
+        const childrenClassName = location.childCount ? `${componentClassName}--has-children` : '';
+        const finalClassName = `${componentClassName} ${selectedClassName} ${childrenClassName}`;
 
         return (
             <div className={finalClassName} onClick={this.handleClick.bind(this)}>

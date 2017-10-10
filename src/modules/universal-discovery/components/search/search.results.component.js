@@ -18,12 +18,20 @@ export default class SearchResultsComponent extends Component {
         };
     }
 
+    componentWillReceiveProps(props) {
+        this.setState(state => Object.assign({}, state, {
+            items: props.items,
+            pages: this.splitToPages(props.items, props.perPage)
+        }));
+    }
+
     renderItem(item) {
         item = item.value.Location;
 
         return <SearchResultsItemComponent 
             key={item.id} 
             data={item}
+            contentTypesMap={this.props.contentTypesMap}
             onPreview={this.props.onItemSelect} />
     }
 
@@ -46,20 +54,24 @@ export default class SearchResultsComponent extends Component {
     }
 
     render() {
+        if (!this.state.pages.length) {
+            return null;
+        }
+        
         return (
-            <div className="search-results-component">
-                <div className="search-results-component__title">Search results ({this.state.items.length})</div>
+            <div className="c-search-results">
+                <div className="c-search-results__title">Search results ({this.state.items.length})</div>
                 <SearchPaginationComponent 
                     minIndex={0} 
                     maxIndex={this.state.pages.length - 1} 
                     activeIndex={this.state.activePage} 
                     onChange={this.setActivePage.bind(this)} />
-                <div className="search-results-component__list-headers">
-                    <div className="search-results-component__list-header--name">Name</div>
-                    <div className="search-results-component__list-header--type">Type</div>
-                    <div className="search-results-component__list-header--span"></div>
+                <div className="c-search-results__list-headers">
+                    <div className="c-search-results__list-header--name">Name</div>
+                    <div className="c-search-results__list-header--type">Type</div>
+                    <div className="c-search-results__list-header--span"></div>
                 </div>
-                <div className="search-results-component__list">
+                <div className="c-search-results__list">
                     {this.state.pages[this.state.activePage].map(this.renderItem.bind(this))}
                 </div>
                 <SearchPaginationComponent 
@@ -75,5 +87,6 @@ export default class SearchResultsComponent extends Component {
 SearchResultsComponent.propTypes = {
     items: PropTypes.array.isRequired,
     perPage: PropTypes.number.isRequired,
-    onItemSelect: PropTypes.func.isRequired
+    onItemSelect: PropTypes.func.isRequired,
+    contentTypesMap: PropTypes.object.isRequired
 };

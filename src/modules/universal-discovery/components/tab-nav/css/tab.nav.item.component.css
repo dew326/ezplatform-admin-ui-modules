@@ -1,4 +1,4 @@
-.tab-nav-item-component {
+.c-tab-nav-item {
     background: #f0fafa;
     border: 0 none;
     border-top: 3px solid transparent;
@@ -8,7 +8,7 @@
     font-weight: 700;
 }
 
-.tab-nav-item-component--selected {
+.c-tab-nav-item--selected {
     background: #fff;
     border-top-color: #b30;
 }

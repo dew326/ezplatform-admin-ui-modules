@@ -4,28 +4,32 @@ import PropTypes from 'prop-types';
 import FinderTreeBranchComponent from './finder.tree.branch.component.js';
 
 import './css/finder.component.css';
-import mainLocationData from './data/main.location.json';
-import homeLocationData from './data/home.location.json';
-import usersLocationData from './data/users.location.json';
-import mediaLocationData from './data/media.location.json';
-import blogLocationData from './data/blog.location.json';
 
 export default class FinderComponent extends Component {
     constructor() {
         super();
 
         this.state = {
-            contentMap: {
-                1: mainLocationData,
-                2: homeLocationData,
-                5: usersLocationData,
-                43: mediaLocationData,
-                66: blogLocationData
-            },
-            locations: {
-                0: {parent: 0, data: mainLocationData}
+            locationsMap: {},
+            activeLocations: {}
+        };
+    }
+
+    componentDidMount() {
+        this.props.findLocationsByParentLocationId(this.props.startingLocationId, this.updateLocationsData.bind(this));
+    }
+
+    updateLocationsData({parentLocationId, data}) {
+        this.setState(state => {
+            const activeLocations = Object.assign({}, state.activeLocations);
+            const locationsMap = Object.assign({}, state.locationsMap, {[parentLocationId]: data});
+
+            if (!Object.keys(activeLocations).length) {
+                activeLocations[0] = {parent: 0, data};
             }
-        }
+
+            return Object.assign({}, state, {activeLocations, locationsMap});
+        });
     }
 
     componentDidUpdate() {
@@ -33,20 +37,23 @@ export default class FinderComponent extends Component {
     }
 
     updateBranchesContainerScroll() {
-        this._refBranches.scrollLeft = this._refBranches.scrollWidth - this._refBranches.clientWidth;
-    }
-
-    renderBranch({parent, data}) {
-        if (!data.View) {
+        if (!this._refBranchesContainer) {
             return;
         }
 
+        this._refBranchesContainer.scrollLeft = this._refBranchesContainer.scrollWidth - this._refBranchesContainer.clientWidth;
+    }
+
+    renderBranch({parent, data}) {
+        if (!data.View || !data.View.Result.count) {
+            return null;
+        }
+
         const items = data.View.Result.searchHits.searchHit;
-        const locations = Object.values(this.state.locations);
-        const selectedLocations = locations.map(item => item.parent);
+        const activeLocations = Object.values(this.state.activeLocations);
+        const selectedLocations = activeLocations.map(item => item.parent);
 
         return <FinderTreeBranchComponent 
-            ref={ref => this._lastBranch = ref}
             key={parent} 
             parent={parent} 
             items={items} 
@@ -55,8 +62,16 @@ export default class FinderComponent extends Component {
     }
 
     handleItemClick({parent, location}) {
-        this.updateSelectedBranches(parent, location);
-        this.props.onItemSelect(location);
+        const promise = new Promise((resolve) => {
+            this.props.findLocationsByParentLocationId(parent, resolve);
+        });
+        
+        promise
+            .then((response) => {
+                this.updateLocationsData(response);
+                this.updateSelectedBranches(parent, location);
+                this.props.onItemSelect(location);
+            });
     }
 
     updateSelectedBranches(parent, location) {
@@ -64,29 +79,35 @@ export default class FinderComponent extends Component {
     }
 
     updateLocations(parent, location, state) {
-        const data = state.contentMap[location.id] || {};
+        const data = state.locationsMap[location.id] || {};
         const locationDepth = parseInt(location.depth, 10);
-        const locations = Object
-            .keys(state.locations)
+        const activeLocations = Object
+            .keys(state.activeLocations)
             .filter(key => parseInt(key, 10) < locationDepth)
             .reduce((total, depth) => {
                 depth = parseInt(depth, 10);
 
-                total[depth] = state.locations[depth];
+                total[depth] = state.activeLocations[depth];
 
                 return total;
             }, {});
 
-        locations[locationDepth] = {parent, data};
+        activeLocations[locationDepth] = {parent, data};
 
-        return Object.assign({}, state, {locations});
+        return Object.assign({}, state, {activeLocations});
     }
 
     render() {
+        const activeLocations = Object.values(this.state.activeLocations);
+
+        if (!activeLocations.length) {
+            return null;
+        }
+
         return (
-            <div className="finder-component">
-                <div className="finder-component__branches" ref={(ref) => this._refBranches = ref}>
-                    {Object.values(this.state.locations).map(this.renderBranch.bind(this))}
+            <div className="c-finder" style={{maxHeight:`${this.props.maxHeight}px`}}>
+                <div className="c-finder__branches" ref={(ref) => this._refBranchesContainer = ref}>
+                    {activeLocations.map(this.renderBranch.bind(this))}
                 </div>
             </div>
         );
@@ -94,10 +115,13 @@ export default class FinderComponent extends Component {
 }
 
 FinderComponent.propTypes = {
-    canSelectContent: PropTypes.func,
     multiple: PropTypes.bool,
-    startingLocationId: PropTypes.string,
-    minDiscoverDepth: PropTypes.number,
-    shouldLoadContent: PropTypes.bool,
-    onItemSelect: PropTypes.func.isRequired
+    startingLocationId: PropTypes.number,
+    findLocationsByParentLocationId: PropTypes.func.isRequired,
+    onItemSelect: PropTypes.func.isRequired,
+    maxHeight: PropTypes.number.isRequired
+};
+
+FinderComponent.defaultProps = {
+    startingLocationId: 1
 };

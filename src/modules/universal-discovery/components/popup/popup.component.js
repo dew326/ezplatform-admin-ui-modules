@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import './css/popup.component.css';
 
 export default class PopupComponent extends Component {
-    constructor() {
+    constructor(props) {
         super();
 
         this.state = {
             items: [],
-            visible: false
+            visible: !!props.visible
         };
     }
 
@@ -18,22 +18,22 @@ export default class PopupComponent extends Component {
     }
 
     hidePopup() {
-        this.setState(state => Object.assign({}, state, {visible: false}));
+        this.props.onClose();
     }
 
     render() {
         const attrs = {
-            className: 'popup-component',
+            className: 'c-popup',
             hidden: !this.state.visible
         };
 
         return (
             <div {...attrs}>
-                <h3 className="popup-component__title">{this.props.title}</h3>
-                <div className="popup-component__content">
+                <h3 className="c-popup__title">{this.props.title}</h3>
+                <div className="c-popup__content">
                     {this.props.children}
                 </div>
-                <button className="popup-component__close" onClick={this.hidePopup.bind(this)}>X</button>
+                <button className="c-popup__close" onClick={this.hidePopup.bind(this)}>X</button>
             </div>
         );
     }
@@ -42,5 +42,6 @@ export default class PopupComponent extends Component {
 PopupComponent.propTypes = {
     title: PropTypes.string.isRequired,
     children: PropTypes.any,
-    visible: PropTypes.bool
+    visible: PropTypes.bool,
+    onClose: PropTypes.func
 };

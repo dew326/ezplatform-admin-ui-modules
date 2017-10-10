@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import './tab.nav.item.component.css';
+import './css/tab.nav.item.component.css';
 
 export default class TabNavItemComponent extends Component {
     componentWillReceiveProps(props) {
@@ -14,12 +14,12 @@ export default class TabNavItemComponent extends Component {
 
     render() {
         const attrs = {
-            className: `tab-nav-item-component ${this.props.isSelected ? 'tab-nav-item-component--selected' : ''}`,
+            className: `c-tab-nav-item ${this.props.isSelected ? 'c-tab-nav-item--selected' : ''}`,
             onClick: this.handleClick.bind(this)
         };
 
         return (
-            <div className="tab-nav-item-component__wrapper">
+            <div className="c-tab-nav-item__wrapper">
                 <button {...attrs}>{this.props.title}</button>
             </div>
         );

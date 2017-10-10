@@ -10,13 +10,15 @@ export default class SearchResultsItemComponent extends Component {
 
     render() {
         const item = this.props.data.ContentInfo.Content;
+        const contentType = this.props.contentTypesMap ? this.props.contentTypesMap[item.ContentType._href] : false;
+        const contentTypeName = contentType ? contentType.names.value[0]['#text'] : 'N/A';
 
         return (
-            <div className="search-results-item-component">
-                <div className="search-results-item-component__name" title={item.Name}>{item.Name}</div>
-                <div className="search-results-item-component__type" title={item.ContentType._href}>{item.ContentType._href}</div>
-                <div className="search-results-item-component__actions">
-                    <button className="search-results-item-component__btn--preview" onClick={this.handlePreviewClick.bind(this)}>Preview</button>
+            <div className="c-search-results-item">
+                <div className="c-search-results-item__name" title={item.Name}>{item.Name}</div>
+                <div className="c-search-results-item__type" title={contentTypeName}>{contentTypeName}</div>
+                <div className="c-search-results-item__actions">
+                    <button className="c-search-results-item__btn--preview" onClick={this.handlePreviewClick.bind(this)}>Preview</button>
                 </div>
             </div>
         );
@@ -25,5 +27,6 @@ export default class SearchResultsItemComponent extends Component {
 
 SearchResultsItemComponent.propTypes = {
     data: PropTypes.object.isRequired,
-    onPreview: PropTypes.func.isRequired
+    onPreview: PropTypes.func.isRequired,
+    contentTypesMap: PropTypes.object.isRequired
 };

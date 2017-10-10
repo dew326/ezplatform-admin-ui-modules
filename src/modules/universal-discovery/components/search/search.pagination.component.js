@@ -24,22 +24,22 @@ export default class SearchPaginationComponent extends Component {
         const {minIndex, activeIndex, maxIndex} = this.props;
         const firstAttrs = {
             onClick: this.loadFirstPage.bind(this),
-            className: 'search-pagination-component__btn--first'
+            className: 'c-search-pagination__btn--first'
         };
 
         const prevAttrs = {
             onClick: this.loadPrevPage.bind(this),
-            className: 'search-pagination-component__btn--prev'
+            className: 'c-search-pagination__btn--prev'
         };
 
         const nextAttrs = {
             onClick: this.loadNextPage.bind(this),
-            className: 'search-pagination-component__btn--next'
+            className: 'c-search-pagination__btn--next'
         };
 
         const lastAttrs = {
             onClick: this.loadLastPage.bind(this),
-            className: 'search-pagination-component__btn--last'
+            className: 'c-search-pagination__btn--last'
         };
 
         if (activeIndex === minIndex) { 
@@ -53,7 +53,7 @@ export default class SearchPaginationComponent extends Component {
         }
 
         return (
-            <div className="search-pagination-component">
+            <div className="c-search-pagination">
                 <button {...firstAttrs}>&laquo; First</button>
                 <button {...prevAttrs}>&lsaquo; Previous</button>
                 <button {...nextAttrs}>Next &rsaquo;</button>

@@ -39,8 +39,10 @@ export default class FinderTreeBranchComponent extends Component {
 
     render() {
         return (
-            <div className="finder-tree-branch-component">
-                {this.props.items.map(this.renderLeaf.bind(this))}
+            <div className="c-finder-tree-branch">
+                <div className="c-finder-tree-branch__list-wrapper">
+                    {this.props.items.map(this.renderLeaf.bind(this))}
+                </div>
             </div>
         );
     }

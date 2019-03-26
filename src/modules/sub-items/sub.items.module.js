@@ -461,7 +461,20 @@ export default class SubItemsModule extends Component {
                 'sub_items'
             );
 
-            this.handleBulkOperationFailedNotification(selectedItems, notMovedLocations, modalTableTitle, notificationMessage);
+            const newNotificationMessage =
+                'selected item(s) could not be moved because you do not have proper user permissions. {{ placeholder }} Please contact your Administrator to obtain permissions.';
+            const rawPlaceholdersMap = {
+                placeholder:
+                    "<u><a class='ez-notification-btn ez-notification-btn--show-modal'>Click here for more information.</a></u><br>",
+            };
+
+            this.handleBulkOperationFailedNotification(
+                selectedItems,
+                notMovedLocations,
+                modalTableTitle,
+                notificationMessage,
+                rawPlaceholdersMap
+            );
         }
 
         if (movedLocations.length) {
@@ -597,7 +610,7 @@ export default class SubItemsModule extends Component {
      * @param {String} modalTableTitle
      * @param {String} notificationMessage
      */
-    handleBulkOperationFailedNotification(selectedItems, failedLocations, modalTableTitle, notificationMessage) {
+    handleBulkOperationFailedNotification(selectedItems, failedLocations, modalTableTitle, notificationMessage, rawPlaceholdersMap) {
         const { contentTypesMap } = this.state;
         const failedItemsData = failedLocations.map(({ id: locationId }) => {
             const item = selectedItems.get(locationId);
@@ -611,15 +624,19 @@ export default class SubItemsModule extends Component {
             };
         });
 
-        window.eZ.helpers.notification.showWarningNotification(notificationMessage, (notificationNode) => {
-            const showModalBtn = notificationNode.querySelector('.ez-notification-btn--show-modal');
+        window.eZ.helpers.notification.showWarningNotification(
+            notificationMessage,
+            (notificationNode) => {
+                const showModalBtn = notificationNode.querySelector('.ez-notification-btn--show-modal');
 
-            if (!showModalBtn) {
-                return;
-            }
+                if (!showModalBtn) {
+                    return;
+                }
 
-            showModalBtn.addEventListener('click', this.props.showBulkActionFailedModal.bind(null, modalTableTitle, failedItemsData));
-        });
+                showModalBtn.addEventListener('click', this.props.showBulkActionFailedModal.bind(null, modalTableTitle, failedItemsData));
+            },
+            rawPlaceholdersMap
+        );
     }
 
     renderConfirmationPopupFooter() {
